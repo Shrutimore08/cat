@@ -1,0 +1,143 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+df = pd.read_csv('D:/SPPU BE Lab Practicals/ML/uber.csv')
+df
+
+
+
+df = df.drop(['Unnamed: 0', 'key', 'pickup_datetime'], axis = 1)
+df.dropna(inplace=True)
+
+
+
+sns.boxplot(df['fare_amount'])
+
+
+
+low = df['fare_amount'].quantile(0.05)
+high = df['fare_amount'].quantile(0.95)
+df = df[(df['fare_amount'] > low) & (df['fare_amount'] < high)]
+
+
+
+sns.boxplot(df['fare_amount'])
+
+
+plt.boxplot(df['fare_amount'])
+
+corr = df.corr()
+sns.heatmap(corr, annot=True)
+
+# Train Test Split
+from sklearn.model_selection import train_test_split
+X = df.drop(['fare_amount'], axis=1)
+y = df['fare_amount']
+X_train, x_test, y_train, y_test = train_test_split(X, y)
+
+
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(x_test)
+
+
+from sklearn.metrics import mean_squared_error, r2_score
+RMSE = np.sqrt(mean_squared_error(y_test, y_pred))
+print("RMSE -> ", RMSE)
+R2 = r2_score(y_test, y_pred)
+print("R2 -> ", R2)
+
+
+from sklearn.ensemble import RandomForestRegressor
+model = RandomForestRegressor()
+model.fit(X_train, y_train)
+y_pred = model.predict(x_test)
+
+
+from sklearn.metrics import mean_squared_error, r2_score
+RMSE = np.sqrt(mean_squared_error(y_test, y_pred))
+print("RMSE -> ", RMSE)
+R2 = r2_score(y_test, y_pred)
+print("R2 -> ", R2)
+
+
+---------------------------------------------
+
+#In this code, you've applied machine learning to predict Uber fares using both Linear Regression and Random Forest Regression models. Here's a breakdown of each section with the relevant ML theory:
+
+1. Correlation Analysis
+
+corr = df.corr()
+sns.heatmap(corr, annot=True)
+
+Correlation Matrix: This heatmap shows the relationships between features. In a supervised learning context, identifying strong correlations with the target variable (here, fare_amount) can guide feature selection.
+Purpose: Features highly correlated with fare_amount are more likely to be relevant predictors. Understanding these relationships can improve model interpretability and help avoid multicollinearity issues, which can impact linear regression models.
+2. Train-Test Split
+
+from sklearn.model_selection import train_test_split
+X = df.drop(['fare_amount'], axis=1)
+y = df['fare_amount']
+X_train, x_test, y_train, y_test = train_test_split(X, y)
+
+Purpose: The dataset is split into training and test sets to evaluate model performance on unseen data, which is critical in ML for ensuring generalizability.
+Theory: By reserving part of the data (usually 20-30%) as a test set, we can assess the model's real-world performance, which helps prevent overfitting (learning too closely to the training data patterns).
+
+3. Linear Regression Model
+
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(x_test)
+
+
+Algorithm: Linear Regression is a simple model that assumes a linear relationship between input features and the target variable.
+Training: The model learns by minimizing the residual sum of squares between the observed and predicted values, finding a "best fit" line.
+Use Case: In fare prediction, linear regression can be a baseline model, although it may struggle with complex, nonlinear relationships.
+python
+Copy code
+from sklearn.metrics import mean_squared_error, r2_score
+RMSE = np.sqrt(mean_squared_error(y_test, y_pred))
+print("RMSE -> ", RMSE)
+R2 = r2_score(y_test, y_pred)
+print("R2 -> ", R2)
+RMSE (Root Mean Squared Error): Indicates the average prediction error; a lower RMSE suggests better model accuracy.
+R² Score: Measures how well the model explains the variance in fare_amount. A score close to 1 implies a better fit.
+Interpretation: For fare predictions, high R² and low RMSE indicate a model that generalizes well.
+
+4. Random Forest Regression Model
+
+from sklearn.ensemble import RandomForestRegressor
+model = RandomForestRegressor()
+model.fit(X_train, y_train)
+y_pred = model.predict(x_test)
+
+
+Algorithm: Random Forest is an ensemble learning method that builds multiple decision trees and averages their predictions. It’s well-suited for handling non-linear relationships and complex datasets.
+Training: The model grows multiple decision trees by training each one on a random subset of the data. It then averages the predictions to reduce variance and avoid overfitting.
+
+Use Case: Random Forest often performs better on structured datasets with complex patterns, like Uber fare prediction, where fare might depend on multiple factors.
+
+from sklearn.metrics import mean_squared_error, r2_score
+RMSE = np.sqrt(mean_squared_error(y_test, y_pred))
+print("RMSE -> ", RMSE)
+R2 = r2_score(y_test, y_pred)
+print("R2 -> ", R2)
+
+Performance Comparison: Comparing RMSE and R² of Random Forest with Linear Regression helps determine which model is better suited for this problem.
+Random Forest Insights: Due to its ability to capture complex relationships, Random Forest may outperform Linear Regression in this scenario, especially if the data contains non-linear dependencies.
+Summary of Model Selection for Uber Fare Prediction
+Linear Regression: Serves as a good starting point but may underperform on complex datasets where relationships are not purely linear.
+Random Forest Regression: A robust choice for fare prediction as it captures non-linear patterns and interactions among features more effectively.
+Model Evaluation: Comparing RMSE and R² for both models helps in understanding which model generalizes better, guiding further tuning or model selection.
+Final Thoughts
+In practice, more advanced models (like gradient boosting or neural networks) and feature engineering may further improve prediction accuracy.
+
+
+
+
+
+
